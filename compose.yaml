@@ -1,0 +1,7 @@
+﻿services:
+  meadowserver:
+    image: meadowserver
+    build:
+      context: .
+      dockerfile: MeadowServer/Dockerfile
+
