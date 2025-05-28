@@ -14,6 +14,7 @@ public class Worker(ILogger<Worker> logger, IOptions<Config> config, IAgonesMana
         logger.LogInformation("Starting TCP listener...");
         var listener = new TcpListener(new IPEndPoint(IPAddress.Any, _config.Port));
         listener.Start();
+        await agonesManager.MarkAsReadyAsync();
         var clients = new List<TcpClient>();
         try
         {

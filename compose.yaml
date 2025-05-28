@@ -1,7 +1,65 @@
 ﻿services:
-  meadowserver:
-    image: meadowserver
+  gameserver:
     build:
       context: .
       dockerfile: MeadowServer/Dockerfile
+    ports:
+      - "7654:7654"
 
+  sdk-server:
+    image: "us-docker.pkg.dev/agones-images/release/agones-sdk:1.49.0"
+    command: --local -f /gs_config
+    network_mode: service:gameserver # <shared network between sdk and game server>
+    configs:
+      - gs_config
+
+  cockroachdb:
+    image: cockroachdb/cockroach:latest-v23.1
+    command: start-single-node --insecure --store=attrs=ssd,path=/var/lib/cockroach/
+    restart: "no"
+    volumes:
+      - nakama-data:/var/lib/cockroach
+    expose:
+      - "8080"
+      - "26257"
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+  nakama:
+    build: ./modules/meadow-nakama
+    entrypoint:
+      - "/bin/sh"
+      - "-ecx"
+      - >
+        /nakama/nakama migrate up --database.address root@cockroachdb:26257 &&
+        exec /nakama/nakama --name nakama1 --database.address root@cockroachdb:26257 --logger.level DEBUG --session.token_expiry_sec 7200          
+    restart: "no"
+    links:
+      - "cockroachdb:db"
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+    expose:
+      - "7349"
+      - "7350"
+      - "7351"
+      - "9100"
+    ports:
+      - "7349:7349"
+      - "7350:7350"
+      - "7351:7351"
+    healthcheck:
+      test: ["CMD", "/nakama/nakama", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  nakama-data:
+configs:
+  gs_config:
+    file: ./MeadowServer/gameserver.yaml
