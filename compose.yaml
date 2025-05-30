@@ -62,4 +62,4 @@ volumes:
   nakama-data:
 configs:
   gs_config:
-    file: ./MeadowServer/gameserver.yaml
+    file: ./k8s/gameserver.yaml

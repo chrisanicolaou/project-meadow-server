@@ -1,0 +1,90 @@
+[
+  {
+    "name": "Young Student",
+    "class": "Philosopher",
+    "typeName": "Fighter",
+    "effectDescription": "When played, draw a card.",
+    "focusCost": 2,
+    "abilities": [
+      {
+        "typeName": "TriggeredAbility",
+        "trigger": {
+          "typeName": "WhenPlayed"
+        },
+        "effects": [
+          {
+            "typeName": "DrawCard",
+            "filters": [
+              {
+                "typeName": "PlayerFilter",
+                "value": ["Self"]
+              }
+            ],
+            "value": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Propaganda",
+    "class": "Philosopher",
+    "typeName": "Spell",
+    "effectDescription": "Silence an enemy fighter.",
+    "focusCost": 2,
+    "abilities": [
+      {
+        "typeName": "TriggeredAbility",
+        "trigger": {
+          "typeName": "WhenPlayed"
+        },
+        "effects": [
+          {
+            "typeName": "Silence",
+            "filters": [
+              {
+                "typeName": "EnemyFightersInPlayFilter"
+              }
+            ],
+            "selectionMode": "Targeted",
+            "selectionAmount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Caltrops",
+    "class": "Thief",
+    "typeName": "Item",
+    "effectDescription": "Whenever an enemy fighter is played, deal 1 damage to it.",
+    "focusCost": 2,
+    "abilities": [
+      {
+        "typeName": "TriggeredAbility",
+        "trigger": {
+          "typeName": "WhenOtherCardPlayed",
+          "oneShot": false,
+          "filters": [
+            {
+              "typeName": "CardTypeFilter",
+              "value": ["Fighter"],
+              "matchOnSource": true
+            },
+            {
+              "typeName": "PlayerFilter",
+              "value": ["Opponent"]
+            }
+          ]
+        },
+        "effects": [
+          {
+            "typeName": "DealDamage",
+            "targetTriggerSource": true,
+            "value": 1
+          }
+        ]
+      }
+    ]
+  }
+]

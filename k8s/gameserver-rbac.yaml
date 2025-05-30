@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agones-gameserver-role
+rules:
+  - apiGroups: ["agones.dev"]
+    resources: ["gameservers"]
+    verbs: ["get", "list", "watch", "delete", "create"]
+
+  - apiGroups: ["allocation.agones.dev"]
+    resources: ["gameserverallocations"]
+    verbs: ["get", "list", "watch", "delete", "create"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: default-sa-agones-gameserver-binding
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: agones-gameserver-role
+  apiGroup: rbac.authorization.k8s.io

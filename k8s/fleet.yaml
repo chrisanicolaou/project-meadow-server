@@ -1,0 +1,27 @@
+﻿apiVersion: agones.dev/v1
+kind: Fleet
+metadata:
+  name: meadow-game-server
+spec:
+  replicas: 2
+  template:
+    spec:
+      ports:
+        - name: default
+          portPolicy: Dynamic
+          containerPort: 7654
+          protocol: TCP
+      health:
+        initialDelaySeconds: 15
+      template:
+        spec:
+          containers:
+            - name: meadow-game-server
+              image: docker.io/chrisanicolaou/meadow-server:alpha
+              resources:
+                requests:
+                  memory: 64Mi
+                  cpu: 20m
+                limits:
+                  memory: 64Mi
+                  cpu: 20m

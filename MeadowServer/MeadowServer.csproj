@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="AgonesSDK" Version="1.49.0" />
+        <PackageReference Include="MeadowShared" Version="0.0.2" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1"/>
     </ItemGroup>
 

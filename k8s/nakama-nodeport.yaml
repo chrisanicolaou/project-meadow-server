@@ -1,0 +1,21 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: nakama-nodeport
+  labels:
+    io.kompose.service: nakama
+spec:
+  type: NodePort
+  selector:
+    io.kompose.service: nakama
+  ports:
+    - name: 7350-tcp
+      port: 7350
+      targetPort: 7350
+      protocol: TCP
+      nodePort: 31350  # pick a port in 30000–32767
+    - name: 7351-tcp
+      port: 7351
+      targetPort: 7351
+      protocol: TCP
+      nodePort: 31351  # pick another port in 30000–32767

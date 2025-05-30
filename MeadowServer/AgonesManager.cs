@@ -53,6 +53,7 @@ public class AgonesManager : IAgonesManager
     {
         try
         {
+            await Task.Delay(10000);
             while (!_appLifetime.ApplicationStopping.IsCancellationRequested)
             {
                 await HealthCheckAsync();

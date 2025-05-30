@@ -9,6 +9,8 @@ public class Worker(ILogger<Worker> logger, IOptions<Config> config, IAgonesMana
 {
     private readonly Config _config = config.Value;
 
+    private List<NetworkStream> _streams = [];
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Starting TCP listener...");
@@ -18,7 +20,7 @@ public class Worker(ILogger<Worker> logger, IOptions<Config> config, IAgonesMana
         var clients = new List<TcpClient>();
         try
         {
-            while (clients.Count < 1 && !stoppingToken.IsCancellationRequested)
+            while (clients.Count < 2 && !stoppingToken.IsCancellationRequested)
             {
                 var client =  await listener.AcceptTcpClientAsync(stoppingToken);
                 clients.Add(client);
@@ -48,6 +50,7 @@ public class Worker(ILogger<Worker> logger, IOptions<Config> config, IAgonesMana
     private async Task HandleClientAsync(TcpClient client, CancellationToken stoppingToken)
     {
         await using var stream = client.GetStream();
+        _streams.Add(stream);
         await ProcessIncomingMessages(stream, stoppingToken);
         // var message = $"📅 {DateTime.Now} 🕛";
         // var dateTimeBytes = Encoding.UTF8.GetBytes(message);
@@ -63,8 +66,9 @@ public class Worker(ILogger<Worker> logger, IOptions<Config> config, IAgonesMana
             Memory<byte> buffer = new byte[1024];
 
             var size = await stream.ReadAsync(buffer, stoppingToken);
+            if (size == 0) continue;
         
-            var message = Encoding.UTF8.GetString(buffer.Span[..(size - 1)]);
+            var message = Encoding.UTF8.GetString(buffer.Span[..(size)]);
             logger.LogInformation("Received message: \"{Message}\"", message);
             switch (message)
             {
@@ -73,9 +77,17 @@ public class Worker(ILogger<Worker> logger, IOptions<Config> config, IAgonesMana
                     _ = SendMessage(stream, $"Received KILL request! Shutting down...");
                     break;
                 default:
-                    _ = SendMessage(stream, $"Received {message}!");
+                    await SendMessageToAllClients(message);
                     break;
             }
+        }
+    }
+
+    private async Task SendMessageToAllClients(string message)
+    {
+        foreach (var stream in _streams)
+        {
+            await SendMessage(stream, message);
         }
     }
 
