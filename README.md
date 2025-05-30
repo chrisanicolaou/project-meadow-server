@@ -37,5 +37,9 @@ Once you're done, you can remove the cluster with:
 .\Setup\stop-cluster.sh
 ```
 
+## Troubleshooting
+### "Found drivers but none were healthy"
+Make sure your docker engine is online (open Docker Desktop on Windows)
+
 ## TODO's
 - Introduce persistent volumes for local nakama
