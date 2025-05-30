@@ -17,7 +17,6 @@ simple TCP listener today, Greatest Multiplayer Card Game Ever tomorrow (tm)
 ```
 kubectl get pods -o wide
 ```
-3. Take note of one of the ports
 
 ## Test with MeadowClient
 1. Navigate to [Nakama's Admin UI](http://localhost:31351) and login with `admin` & `password`.
